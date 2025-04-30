@@ -24,8 +24,8 @@ public:
 
 private slots:
 
-    //void durationChanged(qint64 duration);
-    //void positionChanged(qint64 progress);
+    void durationChanged(qint64 duration);
+    void positionChanged(qint64 progress);
 
     void on_actionOpen_File_triggered();
 
@@ -43,7 +43,8 @@ private slots:
 
     void on_pushButton_Mute_clicked();
 
-   // void on_horizontalSlider_Duration_valueChanged(int value);
+
+    void on_horizontalSlider_Duration_sliderPressed();
 
 private:
     Ui::MainWindow *ui;

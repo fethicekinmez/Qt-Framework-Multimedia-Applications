@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     m_Player->setAudioOutput(audioOutput);
     audioOutput->setVolume(0.1);
 
-    //QObject::connect(m_Player, &QMediaPlayer::durationChanged, this, &MainWindow::durationChanged);
-    //QObject::connect(m_Player, &QMediaPlayer::positionChanged, this, &MainWindow::positionChanged);
+    QObject::connect(m_Player, &QMediaPlayer::durationChanged, this, &MainWindow::durationChanged);
+    QObject::connect(m_Player, &QMediaPlayer::positionChanged, this, &MainWindow::positionChanged);
 
    // ui->horizontalSlider_Duration->setRange(0, m_Player->duration() / 1000);
 }
@@ -27,50 +27,63 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-/*
-void MainWindow::updateDuration(qint64 duration)
+
+void MainWindow::durationChanged(qint64 duration)
 {
-    QTime CurrentTime((duration / 3600) % 60, (duration / 60) % 60, duration % 60, (duration * 1000) % 1000);
-    QTime totalTime((m_Duration / 3600) & 60, (m_Duration / 60) % 60, (m_Duration % 60), (m_Duration * 1000) % 1000);
+    m_Duration = duration / 1000;
+    ui->horizontalSlider_Duration->setMaximum(duration);
+    QTime totalTime((m_Duration / 3600) % 60, (m_Duration / 60) % 60, (m_Duration % 60), (m_Duration * 1000) % 1000);
+    QString format = "mm:ss";
+    if(m_Duration > 3600){
+        format = "hh:mm:ss";
+    }
+    ui->label_valueEnd->setText(totalTime.toString(format));
+}
+
+void MainWindow::positionChanged(qint64 progress)
+{
+    progress = progress / 1000;
+    QTime CurrentTime((progress / 3600) % 60, (progress / 60) % 60, (progress % 60), (progress * 1000) % 1000);
+    //qDebug() << CurrentTime;
     QString format = "mm:ss";
     if(m_Duration > 3600){
         format = "hh:mm:ss";
     }
     ui->label_valueStart->setText(CurrentTime.toString(format));
-    ui->label_valueEnd->setText(totalTime.toString(format));
 
-}
-
-void MainWindow::durationChanged(qint64 duration)
-{
-    m_Duration = duration / 1000;
-    ui->horizontalSlider_Duration->setMaximum(m_Duration);
-}
-
-void MainWindow::positionChanged(qint64 progress)
-{
     if(!ui->horizontalSlider_Duration->isSliderDown()){
-        ui->horizontalSlider_Duration->setValue(progress/1000);
+        ui->horizontalSlider_Duration->setValue(progress*1000);
     }
-
-    updateDuration(progress/1000);
 }
 
-
-
-void MainWindow::on_horizontalSlider_Duration_valueChanged(int value)
+void MainWindow::on_horizontalSlider_Duration_sliderPressed()
 {
-    m_Player->setPosition(value * 1000);
+    qint64 value = ui->horizontalSlider_Duration->value();
+    m_Player->setPosition(value);
 }
-*/
+
 void MainWindow::on_pushButton_SeekForward_clicked()
 {
-
+    double rate = m_Player->playbackRate();
+    if(rate < 2){
+        rate += 0.1;
+        m_Player->setPlaybackRate(rate);
+    }
+    else{
+        qDebug() << "Already at Max playback speed";
+    }
 }
 
 void MainWindow::on_pushButton_SeekBackward_clicked()
 {
-
+    double rate = m_Player->playbackRate();
+    if(rate > 0){
+        rate -= 0.1;
+        m_Player->setPlaybackRate(rate);
+    }
+    else{
+        qDebug() << "Already at Min playback speed";
+    }
 }
 
 void MainWindow::on_actionOpen_File_triggered()
@@ -80,6 +93,7 @@ void MainWindow::on_actionOpen_File_triggered()
     ui->label_FileName->setText(File.fileName());
     m_Player->setSource(QUrl(filename));
     m_Player->play();
+
 }
 
 void MainWindow::on_pushButton_Stop_clicked()
@@ -94,7 +108,6 @@ void MainWindow::on_pushButton_Stop_clicked()
 
 }
 
-
 void MainWindow::on_pushButton_Pause_clicked()
 {
     if(m_Player->isPlaying()){
@@ -107,7 +120,6 @@ void MainWindow::on_pushButton_Pause_clicked()
 
 }
 
-
 void MainWindow::on_pushButton_Play_clicked()
 {
     if(!m_Player->isPlaying()){
@@ -119,17 +131,12 @@ void MainWindow::on_pushButton_Play_clicked()
     }
 }
 
-
-
 void MainWindow::on_horizontalSlider_Volume_valueChanged(int value)
 {
     double volume = double(ui->horizontalSlider_Volume->value())/100;
     audioOutput->setVolume(volume);
     qDebug() << "Volume Changed" << volume << " - " << audioOutput->volume();
 }
-
-
-
 
 void MainWindow::on_pushButton_Mute_clicked()
 {
@@ -146,7 +153,6 @@ void MainWindow::on_pushButton_Mute_clicked()
     }
     qDebug() << "Is Muted: " << audioOutput->isMuted() << " - " << isMuted;
 }
-
 
 
 

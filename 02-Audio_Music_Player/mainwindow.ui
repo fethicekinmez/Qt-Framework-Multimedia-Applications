@@ -87,6 +87,9 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
     <property name="orientation">
      <enum>Qt::Orientation::Horizontal</enum>
     </property>
@@ -159,7 +162,7 @@
      <string>00:00:00</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>40</x>
