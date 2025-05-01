@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     ui->pushButton_Play_Pause->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    ui->pushButton_Stop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     ui->pushButton_SeekBackward->setIcon(style()->standardIcon(QStyle::SP_MediaSeekBackward));
     ui->pushButton_SeekForward->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
     ui->pushButton_Mute->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
